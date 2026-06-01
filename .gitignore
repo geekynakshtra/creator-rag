@@ -1,0 +1,28 @@
+# env
+.env
+backend/.env
+frontend/.env.local
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Chroma local database
+chroma_db/
+backend/chroma_db/
+
+# Node / Next
+node_modules/
+.next/
+out/
+
+# OS
+.DS_Store
+
+# temp media
+*.mp3
+*.mp4
+*.wav
+*.m4a
+temp_audio*
