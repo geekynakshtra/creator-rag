@@ -2,7 +2,7 @@
 .env
 backend/.env
 frontend/.env.local
-
+.idea/
 # Python
 .venv/
 __pycache__/
@@ -26,3 +26,8 @@ out/
 *.wav
 *.m4a
 temp_audio*
+backend/test_chroma.py
+backend/test_groq.py
+# local debug scripts
+backend/test_chroma.py
+backend/test_groq.py
