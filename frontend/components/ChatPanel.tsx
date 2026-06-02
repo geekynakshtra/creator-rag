@@ -47,6 +47,7 @@ export default function ChatPanel() {
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
 
+      let buffer = ""
       let fullAnswer = ""
       let sources: any[] = []
 
@@ -55,11 +56,13 @@ export default function ChatPanel() {
 
         if (done) break
 
-        const chunk = decoder.decode(value)
+        buffer += decoder.decode(value, {
+          stream: true
+        })
 
-        const events = chunk
-          .split("\n\n")
-          .filter(Boolean)
+        const events = buffer.split("\n\n")
+
+        buffer = events.pop() || ""
 
         for (const event of events) {
           if (!event.startsWith("data:")) {
@@ -67,29 +70,43 @@ export default function ChatPanel() {
           }
 
           const jsonText = event
-            .replace("data:", "")
+            .replace(/^data:\s*/, "")
             .trim()
 
-          const parsed = JSON.parse(jsonText)
-
-          if (parsed.type === "sources") {
-            sources = parsed.content
+          if (!jsonText) {
+            continue
           }
 
-          if (parsed.type === "token") {
-            fullAnswer += parsed.content
+          try {
+            const parsed = JSON.parse(jsonText)
 
-            setStreamedText(fullAnswer)
+            if (parsed.type === "sources") {
+              sources = parsed.content || []
 
-            setResponse({
-              query: finalQuery,
-              answer: fullAnswer,
-              sources
-            })
+              setResponse({
+                query: finalQuery,
+                answer: fullAnswer,
+                sources
+              })
+            }
+
+            if (parsed.type === "token") {
+              fullAnswer += parsed.content || ""
+
+              setStreamedText(fullAnswer)
+
+              setResponse({
+                query: finalQuery,
+                answer: fullAnswer,
+                sources
+              })
+            }
+          } catch (error) {
+            buffer = `${event}\n\n${buffer}`
+            break
           }
         }
       }
-
     } catch (error) {
       console.error(error)
       alert("Chat streaming failed")
@@ -115,9 +132,10 @@ export default function ChatPanel() {
 
         <button
           onClick={() => handleAsk()}
-          className="bg-white text-black px-5 rounded-xl font-semibold"
+          disabled={loading}
+          className="bg-white text-black px-5 rounded-xl font-semibold disabled:opacity-50"
         >
-          Ask
+          {loading ? "Asking..." : "Ask"}
         </button>
       </div>
 
@@ -139,20 +157,22 @@ export default function ChatPanel() {
             </p>
           </div>
 
-          <div>
-            <h3 className="font-bold text-lg mb-3">
-              Sources
-            </h3>
+          {response.sources?.length > 0 && (
+            <div>
+              <h3 className="font-bold text-lg mb-3">
+                Sources
+              </h3>
 
-            <div className="space-y-3">
-              {response.sources.map((source, i) => (
-                <SourceCard
-                  key={i}
-                  source={source}
-                />
-              ))}
+              <div className="space-y-3">
+                {response.sources.map((source, i) => (
+                  <SourceCard
+                    key={i}
+                    source={source}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>
