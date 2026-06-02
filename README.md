@@ -1,6 +1,6 @@
 # Creator RAG Analyzer
 
-Creator RAG Analyzer is a full-stack RAG chatbot that compares two social media videos — one YouTube video and one Instagram Reel/short-form video — using transcript evidence and video-level metadata.
+Creator RAG Analyser is a full-stack RAG chatbot that compares two social media videos — one YouTube video and one Instagram Reel/short-form video — using transcript evidence and video-level metadata.
 
 The goal of this project is not just to chat with transcripts. The system combines transcript chunks, creator metadata, engagement metrics, platform data, and retrieval-grounded LLM reasoning so a creator can ask useful questions like:
 
